@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    namespace属性：该属性的值设置为Mapper接口的全类名
+-->
+<mapper namespace="com.atguigu.mybatis.mapper.EmployeeMapper">
+
+    <!--使用二级缓存-->
+<!--    <cache></cache>-->
+
+    <!--使用第三方二级缓存
+        type属性：指定第三方缓存的实现类的全类名
+    -->
+<!--    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>-->
+
+    <!--choose标签的使用-->
+    <select id="getEmployeeByConditionChoose" resultType="com.atguigu.mybatis.entities.Employee">
+        <include refid="repeatSql"></include>
+        <where>
+            <choose>
+                <when test="id!=null">
+                    id = #{id}
+                </when>
+                <when test="lastName!=null">
+                    last_name = #{lastName}
+                </when>
+                <when test="email!=null">
+                    email = #{email}
+                </when>
+                <otherwise>
+                    salary = #{salary}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <!--set标签的使用-->
+    <update id="updateEmployeeByConditionSet">
+        update employees
+        <set>
+            <if test="lastName!=null">
+                last_name = #{lastName},
+            </if>
+            <if test="email!=null">
+                email = #{email},
+            </if>
+            <if test="salary!=null">
+                salary = #{salary}
+            </if>
+        </set>
+        where id = #{id}
+
+    </update>
+
+    <!--foreach标签的使用-->
+    <select id="getEmployeesByConditionForeach" resultType="com.atguigu.mybatis.entities.Employee">
+        <include refid="repeatSql"></include>
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <!--
+        foreach标签中的属性：
+            collection：设置要遍历的集合
+            item：遍历集合得到的元素
+            open：设置开始的符号
+            close：设置结束的符号
+            separator：设置元素之间的分隔符
+            index：如果遍历的是集合，指的是下标
+                   如果遍历的是Map，指的是key
+    -->
+
+    <!--sql标签：用来复用sql语句
+        id属性：指定一个唯一的标识以便被引用
+    -->
+    <sql id="repeatSql">
+        select id,last_name,email,salary,dept_id
+        from employees
+    </sql>
+
+    <!--使用一级缓存
+        flushCache属性：一级缓存和二级缓存的开关
+            对应查询来说默认是false，如果设置为true，则一级缓存和二级缓存都不可用
+            对应增删改来说默认是true
+    -->
+    <select id="getEmployeeByLocalCache" resultType="com.atguigu.mybatis.entities.Employee" useCache="false" flushCache="true">
+        <include refid="repeatSql"></include>
+        where id = #{id}
+    </select>
+
+    <!--使用二级缓存
+        useCache属性：设置是否使用二级缓存的开关，
+        默认是true，如果设置为false，则无法使用二级缓存，但是仍可以使用一级缓存
+    -->
+    <select id="getEmployeeBySecondLevelCache" resultType="com.atguigu.mybatis.entities.Employee" useCache="true" flushCache="false">
+        <include refid="repeatSql"></include>
+        where id = #{id}
+    </select>
+    
+    <select id="getEmployees" resultType="com.atguigu.mybatis.entities.Employee">
+        <include refid="repeatSql"></include>
+    </select>
+</mapper>

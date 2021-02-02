@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="db.properties"></properties>
+
+    <!--★2.settings标签-->
+    <settings>
+        <!--开启驼峰命名自动映射功能-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--开启二级缓存-->
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+    </plugins>
+
+    <environments default="development">
+
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--★8.mappers标签：注册Mapper映射文件（sql映射文件）-->
+    <mappers>
+
+        <package name="com.atguigu"/>
+        <!--注册通过MBG生成的Mapper映射文件-->
+        <!--<package name="com.atguigu.mybatis.mbg.mapper"/>
+        <package name="com.atguigu.mybatis.mbg.plus.mapper"/>-->
+    </mappers>
+</configuration>
